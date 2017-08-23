@@ -1,55 +1,86 @@
 <?php
 namespace Sci\Data;
 
-
-class TableRowCursor implements \ArrayAccess {
-    private $RowNo;
+class TableCursor implements \ArrayAccess,\Iterator,\Countable {
+    private $Row;
+    private $Col;
     private $Table;
-    public function __construct($No,&$Table) {
-        $this->RowNo = $No;
+    private $It;
+    private $Fn;
+
+    private function rowExists($offset) {return isset($this->Table->Columns()[$offset]);}
+    private function rowGet($offset) { return @($this->Table->Cell($this->Row,$offset)); }
+    private function rowSet($offset, $value) { $this->Table->Cell($this->Row,$offset,$value); }
+    private function rowCurrent() { return null; }
+    private function rowKey() { return null; }
+    private function rowNext() { }
+    private function rowRewind() { }
+    private function rowValid() { return false; }
+    private function rowCount() { return 0; }
+
+    private function colExists($offset) { return $offset < $this->Table->count(); }
+    private function colGet($offset) { return $this->Table->Cell($offset,$this->Col); }
+    private function colSet($offset, $value) { $this->Table->Cell($offset,$this->Col,$value); }
+    private function colCurrent() { return $this->Table->Cell($this->It,$this->Col); }
+    private function colKey() { return $this->It; }
+    private function colNext() { $this->It ++; }
+    private function colRewind() { $this->It = 0; }
+    private function colValid() { return $this->It < $this->Table->count(); }
+    private function colCount() { return $this->Table->count(); }
+
+    public function __construct($Row,$Col,&$Table) {
+        $this->Row = $Row;
+        $this->Col = $Col;
         $this->Table =& $Table;
+        $this->It = 0;
+        if(!is_null($Row)) {
+            $this->Fn = [
+                'offsetExists'=>[$this,'rowExists'],
+                'offsetGet'=>[$this,'rowGet'],
+                'offsetSet'=>[$this,'rowSet'],
+                'current'=>[$this,'rowCurrent'],
+                'key'=>[$this,'rowKey'],
+                'next'=>[$this,'rowNext'],
+                'rewind'=>[$this,'rowRewind'],
+                'valid'=>[$this,'rowValid'],
+                'count'=>[$this,'rowCount'],
+            ];
+        }
+        else {
+            $this->Fn = [
+                'offsetExists'=>[$this,'colExists'],
+                'offsetGet'=>[$this,'colGet'],
+                'offsetSet'=>[$this,'colSet'],
+                'current'=>[$this,'colCurrent'],
+                'key'=>[$this,'colKey'],
+                'next'=>[$this,'colNext'],
+                'rewind'=>[$this,'colRewind'],
+                'valid'=>[$this,'colValid'],
+                'count'=>[$this,'colCount'],
+            ];
+        }
     }
 
     #region ArrayAccess Members
-    public function offsetExists($offset) { return isset($this->Table->Columns()[$offset]); }
-    public function offsetGet($offset) { return @($this->Table->Cell($this->RowNo,$offset)); }
-    public function offsetSet($offset, $value) { $this->Table->Cell($this->RowNo,$offset,$value); }
-    public function offsetUnset($offset) { }
-    #endregion
-}
-
-class TableColumnCursor implements \ArrayAccess,\Iterator,\Countable {
-    private $Column;
-    private $Table;
-    private $RowIt;
-    public function __construct($Column,&$Table) {
-        $this->Column = $Column;
-        $this->Table =& $Table;
-        $this->RowIt = 0;
-    }
-
-    #region ArrayAccess Members
-    public function offsetExists($offset) { return $offset < $this->Table->count(); }
-    public function offsetGet($offset) {
-        return $this->Table->Cell($offset,$this->Column);
-    }
-    public function offsetSet($offset, $value) { $this->Table->Cell($offset,$this->Column,$value); }
+    public function offsetExists($offset) { return call_user_func($this->Fn['offsetExists'],$offset); }
+    public function offsetGet($offset) { return call_user_func($this->Fn['offsetGet'],$offset); }
+    public function offsetSet($offset, $value) { call_user_func($this->Fn['offsetSet'],$offset,$value); }
     public function offsetUnset($offset) { }
     #endregion
 
     #region Iterator Members
-    public function current() { return $this->Table->Cell($this->RowIt,$this->Column); }
-    public function key() { return $this->RowIt; }
-    public function next() { $this->RowIt ++; }
-    public function rewind() { $this->RowIt = 0; }
-    public function valid() { return $this->RowIt < $this->Table->count(); }
+    public function current() { return call_user_func($this->Fn['current']); }
+    public function key() { return call_user_func($this->Fn['key']); }
+    public function next() { call_user_func($this->Fn['next']); }
+    public function rewind() {call_user_func($this->Fn['rewind']); }
+    public function valid() { return call_user_func($this->Fn['valid']); }
     #endregion
 
     #region Countable Members
-    public function count() { return $this->Table->count(); }
-
+    public function count() { return call_user_func($this->Fn['count']); }
     #endregion
 }
+
 
 /**
  * Table data manipulation
@@ -69,7 +100,7 @@ class Table implements \Countable, \Iterator, \ArrayAccess
         $this->Columns = [];
         $this->Rows = [];
         $this->RowIt = 0;
-        $this->ColumnsList = new class implements \ArrayAccess {
+        $this->ColumnsList = new class ($this) implements \ArrayAccess {
             private $Table;
             public function __construct(Table &$Table) { $this->Table =& $Table; }
             #region ArrayAccess Members
@@ -80,6 +111,9 @@ class Table implements \Countable, \Iterator, \ArrayAccess
             #endregion
         };
     }
+    /**
+     * @ignore
+     */
     private function __recordset(&$Stmnt) {
         for($i=0;$i<$Stmnt->columnCount();$i++) {
             $this->Columns[$Stmnt->getColumnMeta($i)['name']] = $this->ColumnIndex ++;
@@ -91,30 +125,72 @@ class Table implements \Countable, \Iterator, \ArrayAccess
         }
         $Stmnt->closeCursor();
     }
-
+    /**
+     * Import data from Sql database
+     * @param \Sci\Db\Dsn $Db
+     * @param string $SqlQuery
+     * @param array $Args
+     * @return Table
+     */
     public function fromSql(\Sci\Db\Dsn $Db,$SqlQuery,...$Args) {
         $Stmnt = $Db->SqlExecute($SqlQuery,$Args);
         $this->__recordset($Stmnt);
         return $this;
     }
-
+    /**
+     * Get table row by index
+     * @param int $No
+     * @return \null|TableCursor
+     */
     public function Row($No) {
         if($No < \count($this->Rows)) {
-            return new TableRowCursor($No,$this);
+            return new TableCursor($No,null,$this);
         }
         return null;
     }
 
+    /**
+     * Get table column by column name
+     * @param string $Column
+     * @return TableCursor
+     */
     public function Column($Column) {
-        return new TableColumnCursor($Column,$this);
+        return new TableCursor(null,$Column,$this);
     }
 
+    /**
+     * Get\Set column value
+     * @param int $Row
+     * @param string $Column
+     * @param mixed $Val
+     * @return mixed
+     */
     public function Cell($Row,$Column,$Val=null) {
+        !is_null($Val) && $this->Rows[$Row][$this->Columns[$Column]] = $Val;
         return $this->Rows[$Row][$this->Columns[$Column]];
     }
 
+    /**
+     * Get columns list
+     * @return array
+     */
     public function &Columns() {
         return $this->Columns;
+    }
+
+    /**
+     * Add new column to table
+     * @param array $Columns
+     * @return Table
+     */
+    public function AddColumns(...$Columns) {
+        foreach($Columns as $c) {
+            $this->Columns[$c] = $this->ColumnIndex ++;
+        }
+        return $this;
+    }
+
+    public function AddNumRow(...$ColumnValues) {
     }
 
     #region Iterator Members
