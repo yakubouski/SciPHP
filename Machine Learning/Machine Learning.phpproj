@@ -8,6 +8,12 @@
     </RootNamespace>
     <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
     <AssemblyName>Machine Learning</AssemblyName>
+    <Runtime>PHP</Runtime>
+    <RuntimeVersion>7.1</RuntimeVersion>
+    <SaveServerSettingsInUserFile>false</SaveServerSettingsInUserFile>
+    <EnvName>PHPDev</EnvName>
+    <PHPDevHostName>localhost</PHPDevHostName>
+    <PHPDevAutoPort>true</PHPDevAutoPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <IncludeDebugInformation>true</IncludeDebugInformation>
@@ -17,5 +23,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="index.php" />
+    <Compile Include="sci\data\table.php" />
+    <Compile Include="sci\include\dblib.php" />
+    <Compile Include="sci\include\typelib.php" />
+    <Compile Include="sci\sci.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="sci\" />
+    <Folder Include="sci\data\" />
+    <Folder Include="sci\include\" />
   </ItemGroup>
 </Project>
