@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 class Html
 {
     static private function LessComplie($lessSrc) {
@@ -37,6 +37,7 @@ $HTML=<<<"HTML"
         table {
             min-width: 20vw;
             border-collapse: collapse;
+            max-width: 95vw;
             &+* {
                     margin-bottom: 16px;
             }

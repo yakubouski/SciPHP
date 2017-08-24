@@ -75,4 +75,26 @@ class Dsn
         }
         return [];
     }
+
+    public function SqlAssocRecordset($Query,$Fn) {
+        try {
+            $Recordset = [];
+            $sth = $this->h()->prepare($Query);
+            $sth->execute([]);
+            if(is_callable($Fn)) {
+                for($r=0;$row = $sth->fetch(\PDO::FETCH_ASSOC);$r++) {
+                    $Fn($row,$Recordset);
+                }
+            }
+            else {
+                for(;$row = $sth->fetch(\PDO::FETCH_ASSOC);) {
+                    $Recordset[] = $row;
+                }
+            }
+            return $Recordset;
+        }
+        catch(Exception $e) {
+        }
+        return [];
+    }
 }

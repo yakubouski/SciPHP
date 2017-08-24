@@ -193,6 +193,11 @@ class Table implements \Countable, \Iterator, \ArrayAccess
     public function AddNumRow(...$ColumnValues) {
     }
 
+    public function SetRows(&$Rows) {
+        $this->Rows = $Rows;
+        return $this;
+    }
+
     public function Html($TableName='',$ShowRowNumber=true,$ShowColumns=true) {
         ob_start();
         $tblBlocks = [];
