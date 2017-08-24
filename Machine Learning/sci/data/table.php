@@ -193,6 +193,44 @@ class Table implements \Countable, \Iterator, \ArrayAccess
     public function AddNumRow(...$ColumnValues) {
     }
 
+    public function Html($TableName='',$ShowRowNumber=true,$ShowColumns=true) {
+        ob_start();
+        $tblBlocks = [];
+        if(!empty($TableName)) {
+            $tblBlocks[] = "<caption>{$TableName}</caption>";
+        }
+        if($ShowColumns) {
+            $tblBlocks[] = "<thead><tr>";
+            if($ShowRowNumber) {
+                $tblBlocks[] = "<th>№</th>";
+            }
+            foreach($this->Columns as $c=>$i) {
+                $tblBlocks[] = "<th>{$c}</th>";
+            }
+            $tblBlocks[] = "</tr></thead>";
+        }
+        $tblBlocks[] = "<tbody>";
+        $no = 0; foreach($this->Rows as $r) {
+            $tblBlocks[] = "<tr>";
+            if($ShowRowNumber) {
+                $no ++;
+                $tblBlocks[] = "<td class='th'>{$no}</td>";
+            }
+            foreach($r as $c) {
+                $tblBlocks[] = "<td>{$c}</td>";
+            }
+            $tblBlocks[] = "</tr>";
+        }
+        $tblBlocks[] = "</tbody>";
+        $tblBlocks = implode(PHP_EOL,$tblBlocks);
+        print <<<"TABLE"
+<table>
+    $tblBlocks
+</table>
+TABLE;
+        return ob_get_clean();
+    }
+
     #region Iterator Members
     public function current() { return $this->Row($this->RowIt); }
     public function key() { return $this->RowIt; }
