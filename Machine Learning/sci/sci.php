@@ -1,8 +1,6 @@
 <?php
 namespace Sci {
-    include_once 'include/type.php';
-    ini_set('display_errors','on');
-    ini_set('display_startup_errors','on');
+    include_once 'include/std.php';
 
     function Lib(...$Libs) {
         foreach($Libs as $lib) {

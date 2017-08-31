@@ -11,7 +11,7 @@ namespace Sci {
     /**
      * Convert $val to float
      * @param mixed $val
-     * @param mixed $decimals round
+     * @param integer $decimals round
      * @return double
      */
     function Float($val,$decimals=null) {
@@ -20,20 +20,14 @@ namespace Sci {
         return $val;
     }
     /**
-     * Create table manipulation object
-     * @return Data\Table
+     * Safe divide
+     * @param \double|integer $val
+     * @param \double|integer $divider
+     * @param integer $decimals
+     * @return \double|integer
      */
-    function Table() {
-        return new Data\Table();
-    }
-
-    function dim() {}
-
-    /**
-     * Create PDO database connection
-     * @return Db\Dsn
-     */
-    function Dsn($DbDriver,$DbUser,$DbPwd,$DbHost='localhost',$DbName=null,$DpOpt=[]) {
-        return new Db\Dsn($DbDriver,$DbUser,$DbPwd,$DbHost,$DbName,$DpOpt);
+    function Div($val,$divider,$decimals=null) {
+        return !empty($divider) && !empty($val) ? (is_null($decimals) ? ($val/$divider) : round($val/$divider,$decimals) ) :
+            (is_null($decimals) ? 0.0 : round(0.0,$decimals) );
     }
 }

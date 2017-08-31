@@ -180,7 +180,7 @@ class Table implements \Countable, \Iterator, \ArrayAccess
 
     /**
      * Add new column to table
-     * @param array $Columns
+     * @param mixed $Columns
      * @return Table
      */
     public function AddColumns(...$Columns) {

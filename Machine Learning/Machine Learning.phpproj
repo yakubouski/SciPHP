@@ -23,11 +23,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="index.php" />
+    <Compile Include="sci\data\cursor.php" />
     <Compile Include="sci\data\table.php" />
-    <Compile Include="sci\include\type.php" />
+    <Compile Include="sci\include\std.php" />
     <Compile Include="sci\lib\3th\lessc\lessc.php" />
     <Compile Include="sci\lib\html.lib.php" />
     <Compile Include="sci\lib\db.lib.php" />
+    <Compile Include="sci\math\matrix.php" />
+    <Compile Include="sci\math\statistics.php" />
     <Compile Include="sci\sci.php" />
   </ItemGroup>
   <ItemGroup>
@@ -37,5 +40,6 @@
     <Folder Include="sci\include\" />
     <Folder Include="sci\lib\3th\" />
     <Folder Include="sci\lib\3th\lessc\" />
+    <Folder Include="sci\math\" />
   </ItemGroup>
 </Project>
