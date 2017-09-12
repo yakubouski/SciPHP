@@ -81,7 +81,7 @@ class Machine
             list(,$nNeuron,$nLayer) = $n;
             if(isset($this->Neurons[$nLayer+1])) {
                 foreach($this->Neurons[$nLayer+1] as $nNext) {
-                    $n['d'] += $nNext['d'] * $this->Weights[$nLayer+1]->Weights[$nNeuron][$nNext[1]];
+                    $n['d'] += $nNext['d'] * $this->Weights[$nLayer+1]->Weights[$i][$nNext[1]];
                 }
                 $n['d'] *= $Saturation * $this->mathDerivative($n['Y']);
             }
