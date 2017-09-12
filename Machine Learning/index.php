@@ -8,7 +8,7 @@ require_once 'sci/sci.php';
 \Sci\Lib('db','testcase');
 
 $Params = [
-    'Db'=>\Sci\Dsn('p:mysql','root','zsq@!wax','localhost','data')
+    
 ];
 
 //\TestCase::Run('test/test-vector.php',$Params);
