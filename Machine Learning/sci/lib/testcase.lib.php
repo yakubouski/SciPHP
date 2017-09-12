@@ -159,21 +159,23 @@ HTML;
             ob_start();
             $maxRows = 0;
             foreach($Tables as $t) {
-                $prevSep = $prevSep + $t->ColumnCount();
+                $prevSep = $prevSep + count(reset($t));
                 $sepColumns[$prevSep] = 1;
-                $maxRows = max($maxRows,$t->RowCount());
+                $maxRows = max($maxRows,count($t));
             }
             for($r=0;$r<$maxRows;$r++) {
                 print '<tr><td class="th">'.($r+1).'</td>';
                 foreach($Tables as $t) {
-                    if($t->RowExists($r)) {
-                        for($c=0;$c<($lCol = $t->ColumnCount());$c++) {
-                            $val = $t->Cell($r,$c);
+                    $lCol = count(reset($t));
+                    if($r < count($t)) {
+                        $c=0;
+                        foreach($t[$r] as $val) {
                             print '<td'.($c==$lCol-1?' class="sep"':'').'>'.(is_float($val) ? number_format($val,4,',',''):$val).'</td>';
+                            $c++;
                         }
                     }
                     else {
-                        for($c=0;$c<($lCol = $t->ColumnCount());$c++) {
+                        for($c=0;$c<$lCol;$c++) {
                             print '<td'.($c==$lCol-1?' class="sep"':'').'></td>';
                         }
                     }
@@ -194,6 +196,8 @@ HTML;
 
         print '<table>'.ob_get_clean().'</tbody></table>';
     }
+
+
     function printVector($Caption,$Columns,...$Vectors) {
         ob_start();
         $body = '';

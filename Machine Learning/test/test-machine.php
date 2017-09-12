@@ -1,10 +1,6 @@
 <?php
 use Sci\Math\NeuralNetwork\Machine as Machine;
 
-//$nn = new Machine(2,2);
-//$nn->Training(null,1,1,0.1,1,0.9,[0.00,-0.40,0.30,0.20,-0.10,0.20]);
-#$nn = new Machine(2,2,[],[0.00,-0.40,0.30,0.20,-0.10,0.20]);
-
 $DataSet1 = [
     [   0	,   0.7	,],[   0	    ,0.5366  ],
     [   0.5	,   1	,],[   0.2647	,0.9512 ],
@@ -77,9 +73,28 @@ $nn = new Machine(6,2,[2],[
    /*w03 = */0.04, /*w13 = */ 0.01, /*w23 = */ 0.04,
    /*w04 = */0.07, /*w14 = */ 0.02, /*w24 = */ 0.01]);
 
+$W = [];
 $nn->Training(function($n,$epoch,$nn)use(&$DataSet){
     return $DataSet[$n];
-},1,1,0.1,2,0.5);
+},count($DataSet),150,0.1,2,0.5,function($n,$epoch,$nn)use(&$W){
+    $W[] = $nn->getWeights();
+});
+/*
+printTable('Dataset',[
+    'w{|01}','w{|11}','w{|21}','w{|31}','w{|41}','w{|51}','w{|61}',
+    'w{|02}','w{|12}','w{|22}','w{|32}','w{|42}','w{|52}','w{|62}',
+    'w{|03}','w{|13}','w{|23}',
+    'w{|04}','w{|14}','w{|24}',
+],$W);
+*/
+$O = [];
+$R = [];
 
+foreach($DataSet as list($i,$o)) {
+    $O[] = $o;
+    $R[] = $nn->Compute($i,2.0);
+}
 
-printVector('Weights',null,$nn->Weights);
+printTable('Dataset',[
+    'O{|1}','O{|2}','~Y{|1}','~Y{|2}',
+],$O,$R);
