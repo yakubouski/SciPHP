@@ -96,6 +96,36 @@ namespace Sci\Db {
             }
             return [];
         }
+
+        public function SqlAssocObject($Query,$Fn=null) {
+            try {
+                $row = [];
+                $sth = $this->h()->prepare($Query);
+                $sth->execute([]);
+                if(is_callable($Fn)) {
+                    $row = $sth->fetch(\PDO::FETCH_ASSOC);
+                    $Fn($row);
+                }
+                else {
+                    $row = $sth->fetch(\PDO::FETCH_ASSOC);
+                }
+                return $row;
+            }
+            catch(Exception $e) {
+            }
+            return [];
+        }
+
+        public function SqlObject($Query,$Class='\stdClass',$CTorArgs=[]) {
+            try {
+                $sth = $this->h()->prepare($Query);
+                $sth->execute([]);
+                return $sth->fetchObject ($Class,$CTorArgs);
+            }
+            catch(Exception $e) {
+            }
+            return [];
+        }
     }
 }
 

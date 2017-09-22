@@ -17,11 +17,52 @@ class TestCase {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400&amp;subset=cyrillic,cyrillic-ext" rel="stylesheet" />
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
         <script>
             $(document).on('click', 'table>caption', function () {
                 $(this).closest('table').toggleClass('collapse');
             });
         </script>
+        <script src="/test/js/dt.js"></script>
+<script >
+
+var data =
+    [{ person: 'Homer', hairLength: 0, weight: 250, age: 36, sex: 'male' },
+    { person: 'Marge', hairLength: 10, weight: 150, age: 34, sex: 'female' },
+    { person: 'Bart', hairLength: 2, weight: 90, age: 10, sex: 'male' },
+    { person: 'Lisa', hairLength: 6, weight: 78, age: 8, sex: 'female' },
+    { person: 'Maggie', hairLength: 4, weight: 20, age: 1, sex: 'female' },
+    { person: 'Abe', hairLength: 1, weight: 170, age: 70, sex: 'male' },
+    { person: 'Selma', hairLength: 8, weight: 160, age: 41, sex: 'female' },
+    { person: 'Otto', hairLength: 10, weight: 180, age: 38, sex: 'male' },
+    { person: 'Krusty', hairLength: 6, weight: 200, age: 45, sex: 'male' }];
+
+
+var config = {
+    // обучающая выборка
+    trainingSet: data,
+
+    // название атрибута, который содержит название класса, к которому относится тот или иной элемент обучающей выборки
+    categoryAttr: 'sex',
+
+    // масив атрибутов, которые должны игнорироваться при построении дерева
+    ignoredAttributes: ['person']
+
+    // при желании, можно установить ограничения:
+
+    // максимальная высота дерева
+    // maxTreeDepth: 10
+
+    // порог энтропии, при достижении которого следует остановить построение дерева
+    // entropyThrehold: 0.05
+
+    // порог количества элементов обучающей выборки, при достижении которого следует остановить построение дерева
+    // minItemsCount: 3
+};
+
+// построение дерева принятия решений:
+var decisionTree = new dt.DecisionTree(config);
+</script>
         <style type="text/less">
             body {
                 font-family: 'Roboto Condensed', sans-serif;
@@ -170,7 +211,7 @@ HTML;
                     if($r < count($t)) {
                         $c=0;
                         foreach($t[$r] as $val) {
-                            print '<td'.($c==$lCol-1?' class="sep"':'').'>'.(is_float($val) ? number_format($val,4,',',''):$val).'</td>';
+                            print '<td'.($c==$lCol-1?' class="sep"':'').'>'.(is_float($val) ? number_format($val,4,',',''):(is_scalar($val) ? $val: implode(',',$val)) ).'</td>';
                             $c++;
                         }
                     }
@@ -197,6 +238,35 @@ HTML;
         print '<table>'.ob_get_clean().'</tbody></table>';
     }
 
+    function printChartTree($Tree) {
+        $id = 'ChartTree-'.sha1(rand());
+        $Tree = json_encode($Tree,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);
+        print <<<"CHART"
+<div class="chart" id="$id"  style="width: 900px; height: 500px;"></div>
+ <script type="text/javascript">
+      google.charts.load('current', {packages:["treemap"]});
+      google.charts.setOnLoadCallback(function(){
+        var data = google.visualization.arrayToDataTable($Tree);
+        var chart = new google.visualization.TreeMap(document.getElementById('$id'));
+        chart.draw(data, {
+            allowHtml:true,
+            maxDepth: 1,
+            maxPostDepth: 2,
+            minHighlightColor: '#8c6bb1',
+            midHighlightColor: '#9ebcda',
+            maxHighlightColor: '#edf8fb',
+            minColor: '#009688',
+            midColor: '#f7f7f7',
+            maxColor: '#ee8100',
+            headerHeight: 15,
+            showScale: true,
+            useWeightedAverageForAggregation: true
+        });
+      });
+
+</script>
+CHART;
+    }
 
     function printVector($Caption,$Columns,...$Vectors) {
         ob_start();

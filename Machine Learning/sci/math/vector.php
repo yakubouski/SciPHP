@@ -32,6 +32,13 @@ namespace Sci\Math {
             return $this;
         }
 
+        public function FillRandom($Min,$Max) {
+            foreach($this as $i=>$v) {
+                $this[$i] = (random_int(round($Min*1000000),round($Max*1000000))/1000000);
+            }
+            return $this;
+        }
+
         public function Fill($Value) {
             foreach($this as &$v) {
                 $v = $Value;

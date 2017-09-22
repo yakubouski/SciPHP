@@ -25,18 +25,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="index.php" />
-    <Compile Include="index_1.php" />
     <Compile Include="sci\data\cursor.php" />
     <Compile Include="sci\data\table.php" />
     <Compile Include="sci\include\std.php" />
     <Compile Include="sci\lib\3th\lessc\lessc.php" />
     <Compile Include="sci\lib\db.lib.php" />
     <Compile Include="sci\lib\testcase.lib.php" />
+    <Compile Include="sci\math\classification\decisiontree.php" />
     <Compile Include="sci\math\clusterization\kmeans.php" />
     <Compile Include="sci\math\distance.php" />
     <Compile Include="sci\math\math.php" />
     <Compile Include="sci\math\matrix.php" />
-    <Compile Include="sci\math\neuralnetwork\machine.php" />
+    <Compile Include="sci\math\neuralnetwork\kohonen.php" />
+    <Compile Include="sci\math\neuralnetwork\multilayer.php" />
     <Compile Include="sci\math\normalization\scale.php" />
     <Compile Include="sci\math\normalization\sigmoid.php" />
     <Compile Include="sci\math\normalization\linear.php" />
@@ -44,10 +45,15 @@
     <Compile Include="sci\math\statistics.php" />
     <Compile Include="sci\math\vector.php" />
     <Compile Include="sci\sci.php" />
-    <Compile Include="test\test-machine.php" />
+    <Compile Include="test\test-decisiontree - wifi.php" />
+    <Compile Include="test\test-kohonen - wifi.php" />
+    <Compile Include="test\test-kohonen.php" />
+    <Compile Include="test\test-multilayer - wifi.php" />
+    <Compile Include="test\test-multilayer.php" />
     <Compile Include="test\test-vector.php" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="sci\math\classification\" />
     <Folder Include="sci\math\normalization\" />
     <Folder Include="test\" />
     <Folder Include="sci\" />
@@ -59,5 +65,10 @@
     <Folder Include="sci\math\" />
     <Folder Include="sci\math\clusterization\" />
     <Folder Include="sci\math\neuralnetwork\" />
+    <Folder Include="test\data\" />
+    <Folder Include="test\js\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="test\js\dt.js" />
   </ItemGroup>
 </Project>
